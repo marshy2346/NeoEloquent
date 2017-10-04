@@ -21,7 +21,7 @@ class MigrateRefreshCommand extends Command {
     /**
      * {@inheritDoc}
      */
-    public function fire()
+    public function handle()
     {
         if ( ! $this->confirmToProceed()) return;
 
