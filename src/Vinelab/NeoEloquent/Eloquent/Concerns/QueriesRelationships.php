@@ -54,11 +54,28 @@ trait QueriesRelationships
              * Which is the result of Post::has('comments', '>=', 10)->get();
              */
             $countPart = $prefix .'_count';
-            $this->carry([$relation->getParentNode(), "count($prefix)" => $countPart]);
+            $carryArray = ["count($prefix)" => $countPart];
+            if(count($this->query->matches) > 0 && $this->query->matches[0]['parent']['node']) 
+            {
+                array_push($carryArray, $this->query->matches[0]['parent']['node']);
+                if($this->query->matches[0]['related']['node'])
+                {
+                    array_push($carryArray, $this->query->matches[0]['related']['node']);
+                }
+            } else
+            {
+                array_push($carryArray, $relation->getParentNode());
+            }
+            $this->carry($carryArray);
             $this->whereCarried($countPart, $operator, $count);
         }
-
-        $parentNode = $relation->getParentNode();
+        if(count($this->query->matches) > 0 && $this->query->matches[0]['related']['node']) {
+            $parentNode = $this->query->matches[0]['related']['node'];
+        }
+        else 
+        {
+            $parentNode = $relation->getParentNode();
+        }
         $relatedNode = $relation->getRelatedNode();
         // Tell the query to select our parent node only.
         $this->select($parentNode);
